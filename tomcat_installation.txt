@@ -1,0 +1,75 @@
+Tomcat installation steps for ubuntu server
+
+1) Sudo apt update -y 
+2) install default version of java --  sudo apt install -y openjdk-17-jdk
+3) Check the version - - java --version
+4) download the tomcat tar file --wget https://dlcdn.apache.org/tomcat/tomcat-10/v10.1.48/bin/apache-tomcat-10.1.48.tar.gz
+5) Extract the downloaded archive sudo tar xzvf apache-tomcat-10.1.48.tar.gz
+6) Create installation directory -- sudo mkdir -p /opt/tomcat/
+7) Move extracted files to /opt/tomcat sudo mv apache-tomcat-10.1.48/* /opt/tomcat/
+8) Change ownership and permissions sudo chown -R www-data:www-data /opt/tomcat/
+     sudo chmod -R 755 /opt/tomcat/
+9) Create a Systemd Service for Tomcat
+   -- Run this complete command in your terminal
+sudo tee /etc/systemd/system/tomcat.service >/dev/null <<'EOF'
+[Unit]
+Description=Tomcat
+After=network.target
+
+[Service]
+Type=forking
+User=root
+Group=root
+Environment="JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64/"
+Environment="JAVA_OPTS=-Djava.security.egd=file:///dev/urandom"
+Environment="CATALINA_BASE=/opt/tomcat"
+Environment="CATALINA_HOME=/opt/tomcat"
+Environment="CATALINA_PID=/opt/tomcat/temp/tomcat.pid"
+Environment="CATALINA_OPTS=-Xms512M -Xmx1024M -server -XX:+UseParallelGC"
+ExecStart=/opt/tomcat/bin/startup.sh
+ExecStop=/opt/tomcat/bin/shutdown.sh
+
+[Install]
+WantedBy=multi-user.target
+EOF
+   
+   
+After running above commands check the content of the file by running -- cat /etc/systemd/system/tomcat.service
+
+Note: The JAVA_HOME path in your script points to Java 11. If your default-jdk installed Java 17 (common on Ubuntu 22.04+), verify with:
+readlink -f /usr/bin/java | sed "s:bin/java::"
+
+Run this command and cross check the which java version is mentioned 
+readlink -f /usr/bin/java | sed "s:bin/java::"
+
+
+
+10) Configure Tomcat Users (Manager/Admin GUI)
+    sudo vi /opt/tomcat/conf/tomcat-users.xml
+    Add below mentioned content in tomcat-users.xml file 
+	
+<role rolename="ma:wq!nager-gui" />
+<user username="manager" password="StrongPassword" roles="manager-gui,manager-script" />
+
+<role rolename="admin-gui" />
+<user username="admin" password="StrongPassword" roles="manager-gui,admin-gui" />
+
+11) Enable Remote Access to Manager/Host-Manager 
+    
+sudo vi /opt/tomcat/webapps/manager/META-INF/context.xml
+ 
+Comment out this lines 
+ <!-- <Valve className="org.apache.catalina.valves.RemoteAddrValve"
+     allow="127\.\d+\.\d+\.\d+|::1|0:0:0:0:0:0:0:1" /> -->
+ 
+Similarly for Host-Manager:
+sudo vi /opt/tomcat/webapps/host-manager/META-INF/context.xml
+
+<!-- <Valve className="org.apache.catalina.valves.RemoteAddrValve"
+     allow="127\.\d+\.\d+\.\d+|::1|0:0:0:0:0:0:0:1" /> -->
+
+
+
+12) sudo systemctl daemon-reload
+    sudo systemctl restart tomcat
+    sudo systemctl status tomcat
