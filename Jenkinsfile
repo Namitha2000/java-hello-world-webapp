@@ -25,8 +25,6 @@ pipeline {
                    WAR_FILE=$(ls target/*.war)
                    echo "WAR File: $WAR_FILE"
                    cp $WAR_FILE /opt/tomcat/webapps/
-                   echo "Restarting tomcat"
-                   systemctl restart tomcat
                    echo "Deployment completed"
                    '''
             }
