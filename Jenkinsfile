@@ -1,32 +1,42 @@
 pipeline {
     agent any
 
+    tools {
+        jdk 'jdk17'
+        maven 'maven3'
+    }
+
+    environment {
+        SONAR_HOME = tool 'SonarQubeScanner'
+    }
+
     stages {
 
-        stage('Clone') {
+        stage('Checkout Source Code') {
             steps {
                 echo "Stage 1: Cloning repository"
-                git url: 'https://github.com/Namitha2000/java-hello-world-webapp.git'
+                git branch: 'main',
+                    url: 'https://github.com/Namitha2000/java-hello-world-webapp.git'
             }
         }
 
-        stage('Build') {
+        stage('Static Code Analysis - SonarQube') {
             steps {
-                echo "Stage 2: Building using Maven"
+                withSonarQubeEnv('SonarQube-Server') {
+                    sh """
+                    ${SONAR_HOME}/bin/sonar-scanner \
+                    -Dsonar.projectKey=java-hello-world-webapp \
+                    -Dsonar.sources=. \
+                    -Dsonar.java.binaries=target
+                    """
+                }
+            }
+        }
+
+        stage('Build Application') {
+            steps {
+                echo "Stage 3: Building using Maven"
                 sh 'mvn clean package'
-            }
-        }
-
-        stage('Deploy') {
-            steps {
-                echo "Stage 3: Deploying JAR"
-
-                sh '''
-                   WAR_FILE=$(ls target/*.war)
-                   echo "WAR File: $WAR_FILE"
-                   cp $WAR_FILE /opt/tomcat/webapps/
-                   echo "Deployment completed"
-                   '''
             }
         }
     }
