@@ -1,59 +1,41 @@
 pipeline {
     agent any
 
-    parameters {
-        string(name: 'SONAR_URL', defaultValue: 'http://13.50.246.94:9000', description: 'SonarQube server URL')
-    }
-
     tools {
         jdk 'jdk17'
         maven 'maven3'
     }
 
     environment {
-        SONAR_AUTH_TOKEN = 'squ_093817fe64b396b3ca8ad1642543582ec70b6b87'
+        SONARQUBE_URL = 'http://13.50.246.94:9000'
+        SONARQUBE_TOKEN = 'your_token_here'
     }
 
     stages {
 
         stage('Checkout Source Code') {
             steps {
-                echo "Stage 1: Cloning repository"
                 git branch: 'master',
                     url: 'https://github.com/Namitha2000/java-hello-world-webapp.git'
             }
         }
 
-        stage('Build and Test') {
+        stage('Sonarqube Analysis') {
             steps {
-                echo "Stage 2: Building and running tests"
-                sh 'mvn clean verify'
+                sh """
+                mvn clean package sonar:sonar \
+                -Dsonar.projectKey=java-hello-world-webapp \
+                -Dsonar.host.url=$SONARQUBE_URL \
+                -Dsonar.token=$SONARQUBE_TOKEN \
+                """
             }
         }
 
-        stage('Static Code Analysis - SonarQube') {
+        stage('Build Application') {
             steps {
-                echo "Stage 3: Running SonarQube analysis"
-                withSonarQubeEnv('SonarQube') {
-                    sh """
-                        mvn sonar:sonar \
-                            -Dsonar.projectKey=java-hello-world-webapp \
-                            -Dsonar.host.url=${params.SONAR_URL} \
-                            -Dsonar.login=${SONAR_AUTH_TOKEN} \
-                            -Dsonar.coverage.jacoco.xmlReportPaths=""
-                    """
-                }
+                sh 'mvn package -DskipTests'
             }
-        }
-
-    }
-
-    post {
-        success {
-            echo "Pipeline completed successfully!"
-        }
-        failure {
-            echo "Pipeline failed. Check logs for details."
         }
     }
 }
+
