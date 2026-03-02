@@ -7,9 +7,9 @@ pipeline {
     }
 
     parameters {
-        string(name: 'PROJECT_KEY',
-               defaultValue: 'java-hello-world-webapp',
-               description: 'SonarQube Project Key')
+        string(name: 'SONAR_URL',
+               defaultValue: 'http://13.50.246.94:9000',
+               description: 'SonarQube Server URL')
     }
 
     stages {
@@ -29,10 +29,12 @@ pipeline {
 
         stage('SonarQube Analysis') {
             steps {
-                withSonarQubeEnv('SonarQube') {
+                withCredentials([string(credentialsId: 'sonar-token', variable: 'SONAR_TOKEN')]) {
                     sh """
                         mvn sonar:sonar \
-                        -Dsonar.projectKey=${params.PROJECT_KEY}
+                        -Dsonar.projectKey=java-hello-world-webapp \
+                        -Dsonar.host.url=${params.SONAR_URL} \
+                        -Dsonar.login=$SONAR_TOKEN
                     """
                 }
             }
