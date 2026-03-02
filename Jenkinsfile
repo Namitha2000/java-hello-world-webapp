@@ -8,7 +8,7 @@ pipeline {
 
     environment {
         SONARQUBE_URL = 'http://13.50.246.94:9000'
-        SONARQUBE_TOKEN = 'your_token_here'
+        SONARQUBE_TOKEN = 'squ_093817fe64b396b3ca8ad1642543582ec70b6b87'
     }
 
     stages {
