@@ -24,24 +24,25 @@ pipeline {
             }
         }
 
+        stage('Build and Test') {
+            steps {
+                echo "Stage 2: Building and running tests"
+                sh 'mvn clean verify'
+            }
+        }
+
         stage('Static Code Analysis - SonarQube') {
             steps {
-                echo "Stage 2: Running SonarQube analysis"
+                echo "Stage 3: Running SonarQube analysis"
                 withSonarQubeEnv('SonarQube') {
                     sh """
                         mvn sonar:sonar \
                             -Dsonar.projectKey=java-hello-world-webapp \
                             -Dsonar.host.url=${params.SONAR_URL} \
                             -Dsonar.login=${SONAR_AUTH_TOKEN} \
+                            -Dsonar.java.binaries=target/classes
                     """
                 }
-            }
-        }
-
-        stage('Build Application') {
-            steps {
-                echo "Stage 3: Building with Maven"
-                sh 'mvn clean package'
             }
         }
 
@@ -56,4 +57,3 @@ pipeline {
         }
     }
 }
-
