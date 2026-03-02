@@ -16,7 +16,7 @@ pipeline {
         stage('Checkout Source Code') {
             steps {
                 echo "Stage 1: Cloning repository"
-                git branch: 'main',
+                git branch: 'master',
                     url: 'https://github.com/Namitha2000/java-hello-world-webapp.git'
             }
         }
