@@ -31,7 +31,8 @@ pipeline {
             steps {
                 withSonarQubeEnv('SonarQube') {
                     sh """
-                        mvn clean verify org.sonarsource.scanner.maven:sonar-maven-plugin:4.0.0.4121:sonar \
+                        mvn clean verify \
+                org.sonarsource.scanner.maven:sonar-maven-plugin:3.10.0.2594:sonar \
                         -Dsonar.projectKey=${params.PROJECT_KEY}
                     """
                 }
