@@ -26,13 +26,11 @@ pipeline {
 
         stage('Static Code Analysis - SonarQube') {
             steps {
-                echo "Stage 2: Running SonarQube analysis"
-                withSonarQubeEnv('SonarQube') {  
-                    // Use sonar-scanner command directly; Jenkins provides the path automatically
+                echo "Stage 2: Running SonarQube analysis via Maven"
+                withSonarQubeEnv('SonarQube') {
                     sh """
-                        sonar-scanner \
+                        mvn sonar:sonar \
                             -Dsonar.projectKey=java-hello-world-webapp \
-                            -Dsonar.sources=. \
                             -Dsonar.host.url=${params.SONAR_URL} \
                             -Dsonar.login=${SONAR_AUTH_TOKEN}
                     """
