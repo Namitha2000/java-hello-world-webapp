@@ -24,7 +24,7 @@ pipeline {
         stage('Static Code Analysis - SonarQube') {
             steps {
                 // Use the SonarQube server ID configured in Jenkins
-                withSonarQubeEnv('SonarqubeID') {
+                withSonarQubeEnv('SonarQube') {
                     sh """
                     sonar-scanner \
                     -Dsonar.projectKey=java-hello-world-webapp \
