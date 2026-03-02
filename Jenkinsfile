@@ -1,9 +1,8 @@
 pipeline {
     agent any
     tools {
-        jdk 'jdk21'
+        jdk 'jdk17'
         maven 'maven3'
-        git 'Default'
     }
     parameters {
         string(name: 'SONAR_URL', defaultValue: '13.50.246.94', description: 'SonarQube server IP')
