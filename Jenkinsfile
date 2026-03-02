@@ -6,11 +6,6 @@ pipeline {
         maven 'maven3'
     }
 
-    environment {
-        SONARQUBE_URL = 'http://13.50.246.94:9000'
-        SONARQUBE_TOKEN = 'squ_093817fe64b396b3ca8ad1642543582ec70b6b87'
-    }
-
     stages {
 
         stage('Checkout Source Code') {
@@ -20,18 +15,21 @@ pipeline {
             }
         }
 
-        stage('Sonarqube Analysis') {
+        stage('Build & Unit Test') {
             steps {
-                sh """
-                mvn clean verify sonar:sonar \
-                -Dsonar.projectKey=java-hello-world-webapp \
-                -Dsonar.host.url=$SONARQUBE_URL \
-                -Dsonar.token=$SONARQUBE_TOKEN \
-                """
+                sh 'mvn clean verify'
             }
         }
 
-        stage('Build Application') {
+        stage('SonarQube Analysis') {
+            steps {
+                withSonarQubeEnv('SonarQube') {
+                    sh 'mvn sonar:sonar -Dsonar.projectKey=java-hello-world-webapp'
+                }
+            }
+        }
+
+        stage('Package Application') {
             steps {
                 sh 'mvn clean package -DskipTests'
             }
@@ -40,11 +38,10 @@ pipeline {
 
     post {
         success {
-            echo 'All 3 stages executed successfully! Pipeline SUCCESS!'
+            echo 'Pipeline SUCCESS!'
         }
         failure {
-            echo 'Pipeline failed. Please check logs.'
+            echo 'Pipeline FAILED!'
         }
     }
 }
-
