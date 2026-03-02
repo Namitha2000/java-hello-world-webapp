@@ -26,7 +26,7 @@ pipeline {
 
         stage('Static Code Analysis - SonarQube') {
             steps {
-                echo "Stage 2: Running SonarQube analysis via Maven"
+                echo "Stage 2: Running SonarQube analysis (without build)"
                 withSonarQubeEnv('SonarQube') {
                     sh """
                         mvn sonar:sonar \
@@ -41,7 +41,7 @@ pipeline {
 
         stage('Build Application') {
             steps {
-                echo "Stage 3: Building using Maven"
+                echo "Stage 3: Building with Maven"
                 sh 'mvn clean package'
             }
         }
