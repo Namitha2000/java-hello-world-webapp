@@ -23,18 +23,28 @@ pipeline {
         stage('Sonarqube Analysis') {
             steps {
                 sh """
-                mvn clean verify sonar:sonar \
+                mvn sonar:sonar \
                 -Dsonar.projectKey=java-hello-world-webapp \
                 -Dsonar.host.url=$SONARQUBE_URL \
-                -Dsonar.login=$SONARQUBE_TOKEN \
+                -Dsonar.token=$SONARQUBE_TOKEN \
+                -Dsonar.sources=src
                 """
             }
         }
 
         stage('Build Application') {
             steps {
-                sh 'mvn package -DskipTests'
+                sh 'mvn clean package -DskipTests'
             }
+        }
+    }
+
+    post {
+        success {
+            echo 'All 3 stages executed successfully! Pipeline SUCCESS!'
+        }
+        failure {
+            echo 'Pipeline failed. Please check logs.'
         }
     }
 }
