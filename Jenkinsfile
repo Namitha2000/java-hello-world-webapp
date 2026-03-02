@@ -32,7 +32,8 @@ pipeline {
                         mvn sonar:sonar \
                             -Dsonar.projectKey=java-hello-world-webapp \
                             -Dsonar.host.url=${params.SONAR_URL} \
-                            -Dsonar.login=${SONAR_AUTH_TOKEN}
+                            -Dsonar.login=${SONAR_AUTH_TOKEN} \
+                            -Dsonar.coverage.jacoco.xmlReportPaths=""
                     """
                 }
             }
