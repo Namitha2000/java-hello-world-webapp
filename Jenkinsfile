@@ -8,40 +8,28 @@ pipeline {
 
     stages {
 
-        stage('Checkout Source Code') {
+        stage('Checkout') {
             steps {
                 git branch: 'master',
                     url: 'https://github.com/Namitha2000/java-hello-world-webapp.git'
             }
         }
 
-        stage('Build & Unit Test') {
-            steps {
-                sh 'mvn clean verify'
-            }
-        }
-
-        stage('SonarQube Analysis') {
+        stage('Build + Sonar') {
             steps {
                 withSonarQubeEnv('SonarQube') {
-                    sh 'mvn sonar:sonar -Dsonar.projectKey=java-hello-world-webapp'
+                    sh '''
+                    mvn clean verify sonar:sonar \
+                    -Dsonar.projectKey=java-hello-world-webapp
+                    '''
                 }
             }
         }
 
-        stage('Package Application') {
+        stage('Package') {
             steps {
-                sh 'mvn clean package -DskipTests'
+                sh 'mvn package -DskipTests'
             }
-        }
-    }
-
-    post {
-        success {
-            echo 'Pipeline SUCCESS!'
-        }
-        failure {
-            echo 'Pipeline FAILED!'
         }
     }
 }
