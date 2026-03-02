@@ -1,7 +1,6 @@
 pipeline {
     agent any
 
-    // Parameter for SonarQube server URL
     parameters {
         string(name: 'SONAR_URL', defaultValue: 'http://13.50.246.94:9000', description: 'SonarQube server URL')
     }
@@ -29,12 +28,13 @@ pipeline {
             steps {
                 echo "Stage 2: Running SonarQube analysis"
                 withSonarQubeEnv('SonarQube') {  
+                    // Use sonar-scanner command directly; Jenkins provides the path automatically
                     sh """
-                    ${tool 'SonarQubeScanner'}/bin/sonar-scanner \
-                        -Dsonar.projectKey=java-hello-world-webapp \
-                        -Dsonar.sources=. \
-                        -Dsonar.host.url=${params.SONAR_URL} \
-                        -Dsonar.login=${SONAR_AUTH_TOKEN}
+                        sonar-scanner \
+                            -Dsonar.projectKey=java-hello-world-webapp \
+                            -Dsonar.sources=. \
+                            -Dsonar.host.url=${params.SONAR_URL} \
+                            -Dsonar.login=${SONAR_AUTH_TOKEN}
                     """
                 }
             }
@@ -58,3 +58,4 @@ pipeline {
         }
     }
 }
+
