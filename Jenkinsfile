@@ -12,7 +12,6 @@ pipeline {
     }
 
     environment {
-        // Hardcoded SonarQube token
         SONAR_AUTH_TOKEN = 'squ_093817fe64b396b3ca8ad1642543582ec70b6b87'
     }
 
@@ -26,28 +25,28 @@ pipeline {
             }
         }
 
-        stage('Build Application') {
-            steps {
-                echo "Stage 2: Building using Maven"
-                sh 'mvn clean package'
-            }
-        }
-
         stage('Static Code Analysis - SonarQube') {
             steps {
-                // Replace 'MySonarQubeServer' with the name of your SonarQube server in Jenkins
-                withSonarQubeEnv('SonarQube') {
+                echo "Stage 2: Running SonarQube analysis"
+                withSonarQubeEnv('SonarQube') {  
                     sh """
                     ${tool 'SonarQubeScanner'}/bin/sonar-scanner \
                         -Dsonar.projectKey=java-hello-world-webapp \
                         -Dsonar.sources=. \
-                        -Dsonar.java.binaries=target \
                         -Dsonar.host.url=${params.SONAR_URL} \
                         -Dsonar.login=${SONAR_AUTH_TOKEN}
                     """
                 }
             }
         }
+
+        stage('Build Application') {
+            steps {
+                echo "Stage 3: Building using Maven"
+                sh 'mvn clean package'
+            }
+        }
+
     }
 
     post {
