@@ -23,10 +23,10 @@ pipeline {
         stage('Sonarqube Analysis') {
             steps {
                 sh """
-                mvn clean package sonar:sonar \
+                mvn clean verify sonar:sonar \
                 -Dsonar.projectKey=java-hello-world-webapp \
                 -Dsonar.host.url=$SONARQUBE_URL \
-                -Dsonar.token=$SONARQUBE_TOKEN \
+                -Dsonar.login=$SONARQUBE_TOKEN \
                 """
             }
         }
