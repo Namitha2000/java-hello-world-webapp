@@ -8,6 +8,8 @@ pipeline {
 
     environment {
         SONAR_HOME = tool 'SonarQubeScanner'
+        // Add your SonarQube token here
+        SONAR_AUTH_TOKEN = 'squ_093817fe64b396b3ca8ad1642543582ec70b6b87'
     }
 
     stages {
@@ -27,7 +29,8 @@ pipeline {
                     ${SONAR_HOME}/bin/sonar-scanner \
                     -Dsonar.projectKey=java-hello-world-webapp \
                     -Dsonar.sources=. \
-                    -Dsonar.java.binaries=target
+                    -Dsonar.java.binaries=target \
+                    -Dsonar.login=${SONAR_AUTH_TOKEN}
                     """
                 }
             }
