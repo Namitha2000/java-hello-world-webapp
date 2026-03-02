@@ -7,8 +7,7 @@ pipeline {
     }
 
     environment {
-        SONAR_HOME = tool 'SonarQubeScanner'
-        // Add your SonarQube token here
+        // Your SonarQube token
         SONAR_AUTH_TOKEN = 'squ_093817fe64b396b3ca8ad1642543582ec70b6b87'
     }
 
@@ -24,9 +23,10 @@ pipeline {
 
         stage('Static Code Analysis - SonarQube') {
             steps {
-                withSonarQubeEnv('SonarQube-Server') {
+                // Use the SonarQube server ID configured in Jenkins
+                withSonarQubeEnv('SonarqubeID') {
                     sh """
-                    ${SONAR_HOME}/bin/sonar-scanner \
+                    sonar-scanner \
                     -Dsonar.projectKey=java-hello-world-webapp \
                     -Dsonar.sources=. \
                     -Dsonar.java.binaries=target \
@@ -41,6 +41,15 @@ pipeline {
                 echo "Stage 3: Building using Maven"
                 sh 'mvn clean package'
             }
+        }
+    }
+
+    post {
+        success {
+            echo "Pipeline completed successfully!"
+        }
+        failure {
+            echo "Pipeline failed. Check logs for details."
         }
     }
 }
